@@ -1,8 +1,9 @@
 const {Router}=require("express");
 const adminRouter=Router()
-const {adminModel}=require("../db")
+const {adminModel, courseModel}=require("../db")
 const bcrypt = require('bcrypt')
-const jwt=require("jsonwebtoken")
+const jwt=require("jsonwebtoken");
+const { adminMiddleware } = require("../middleware/admin");
 const saltRounds=15;
 const JWT_ADMIN_SECRET="wamiqagabbi"
 
@@ -85,10 +86,26 @@ adminRouter.post("/signin",(req,res)=>{
 
 })
 
-adminRouter.post("/course",(req,res)=>{
-    res.json({
-        "msg":"adminrouter courses"
+adminRouter.post("/course",adminMiddleware,(req,res)=>{
+    const adminId=req.id;
+    const {title,description,imageurl,price}=req.body;
+
+    courseModel.create({
+        title,description,imageurl,price,creatorId:adminId
     })
+    .then((course)=>{
+        return res.json({
+            msg:"course has been added",
+            courseId:course._id
+        })
+    })
+    .catch((e)=>{
+        console.log(e)
+        return res.json({
+            msg:"something is worng int the course creattionthingy"
+        })
+    })
+
 
 })
 
