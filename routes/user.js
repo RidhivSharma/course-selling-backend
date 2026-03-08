@@ -2,11 +2,13 @@ const {Router}=require("express")
 const userRouter=Router();
 const bcrypt = require('bcrypt');
 const {userModel}=require("../db")
-
+const jwt=require("jsonwebtoken")
+const JWT_USER_SECRET="kritisanon"
 const saltRounds=15;
 
 
 userRouter.post("/signup",(req,res)=>{
+    
     let { email,password,firstName,lastName }=req.body;
 
     bcrypt.hash(password, saltRounds)
@@ -43,10 +45,46 @@ userRouter.post("/signup",(req,res)=>{
 })
 
 userRouter.post("/signin",(req,res)=>{
-    res.json({
-        "msg":"signin endpoint"
-    })
-})
+   let {email,password} = req.body;
+
+   userModel.findOne({ email })
+   .then((user)=>{
+
+        if(!user){
+            return res.json({
+                msg:"user not found"
+            });
+        }
+
+        bcrypt.compare(password, user.password)
+        .then((result)=>{
+
+            if(result){
+                const token = jwt.sign(
+                    { id: user._id },
+                    JWT_USER_SECRET
+                );
+
+                return res.json({
+                    token: token
+                });
+
+            }else{
+                return res.json({
+                    msg:"password is not matching try again"
+                });
+            }
+
+        });
+
+   })
+   .catch((e)=>{
+        console.log(e);
+        res.json({
+            msg:"some error occurred"
+        });
+   });
+});
 
 userRouter.get("/purcahsed",(req,res)=>{
     res.json({
