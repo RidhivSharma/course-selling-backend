@@ -87,11 +87,15 @@ adminRouter.post("/signin",(req,res)=>{
 })
 
 adminRouter.post("/course",adminMiddleware,(req,res)=>{
-    const adminId=req.id;
-    const {title,description,imageurl,price}=req.body;
+    const adminId=req.userId;
+    const {title,description,imageUrl,price}=req.body;
 
     courseModel.create({
-        title,description,imageurl,price,creatorId:adminId
+        title:title,
+        description:description,
+        imageUrl:imageUrl,
+        price:price,
+        creatorId:adminId
     })
     .then((course)=>{
         return res.json({
