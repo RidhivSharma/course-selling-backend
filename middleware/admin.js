@@ -1,6 +1,7 @@
+require('dotenv').config()
 const jwt = require("jsonwebtoken")
 
-const JWT_ADMIN_SECRET = "wamiqagabbi"
+const JWT_ADMIN_SECRET = process.env.JWT_ADMIN_SECRET;
 
 function adminMiddleware(req,res,next){
 

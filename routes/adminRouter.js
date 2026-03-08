@@ -1,3 +1,4 @@
+require('dotenv').config()
 const {Router}=require("express");
 const adminRouter=Router()
 const {adminModel, courseModel}=require("../db")
@@ -5,7 +6,7 @@ const bcrypt = require('bcrypt')
 const jwt=require("jsonwebtoken");
 const { adminMiddleware } = require("../middleware/admin");
 const saltRounds=15;
-const JWT_ADMIN_SECRET="wamiqagabbi"
+const JWT_ADMIN_SECRET=process.env.JWT_ADMIN_SECRET;
 
 adminRouter.post("/signup",(req,res)=>{
     let { email,password,firstName,lastName }=req.body;
@@ -113,9 +114,33 @@ adminRouter.post("/course",adminMiddleware,(req,res)=>{
 
 })
 
-adminRouter.put("/courses",(req,res)=>{
-    res.json({
-        "msg":"adminrouter change courses"
+adminRouter.put("/course",(req,res)=>{
+    const adminId=req.userId;
+
+    const {title,description,imageUrl,price,courseId}=req.body;
+    courseModel.updateOne({
+      _id:courseId
+    },{
+        title:title,
+        description:description,
+        imageUrl:imageUrl,
+        price:price,
+        creatorId:adminId
+
+    })
+    .then((course)=>{
+        res.json({
+            "msg":"course have been updated",
+            "courseid":courseId
+        })
+
+    })
+    .catch((e)=>{
+        console.log(e);
+        res.json({
+            msg:"some fuck up have happend"
+        })
+
     })
 
 })

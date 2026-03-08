@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require("express");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
@@ -16,9 +17,7 @@ app.use("/admin",adminRouter)
 
 async function connectDB() {
   try {
-    await mongoose.connect(
-      "mongodb+srv://ridhiv:Samridhi2048@test.d6wd339.mongodb.net/?appName=test/backend-course-selling",
-    );
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("DB connected");
     app.listen(3000, () => {
       console.log("app is running hot on the port 3000");
